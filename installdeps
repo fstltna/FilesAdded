@@ -1,0 +1,15 @@
+#!/bin/bash
+cpan -i Getopt::Long
+cpan -i Text::CSV
+cpan -i Math::Round
+cpan -i WebService::Discord::Webhook
+cpan -i String::Scanf
+cpan -i Cwd
+cpan -i Storable
+cpan -i UI::Dialog
+cpan -i Term::ReadKey
+cpan -i Term::ANSIScreen
+cpan -i Proc::ProcessTable
+cpan -i Number::Bytes::Human
+cpan -i IO::Socket::SSL
+exit 0
