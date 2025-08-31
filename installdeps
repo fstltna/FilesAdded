@@ -12,4 +12,5 @@ cpan -i Term::ANSIScreen
 cpan -i Proc::ProcessTable
 cpan -i Number::Bytes::Human
 cpan -i IO::Socket::SSL
+cpan -i String::Scanf
 exit 0
