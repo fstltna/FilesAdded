@@ -74,11 +74,6 @@ if ($USAGE)
 	exit 0;
 }
 
-open(TEMPFILE, ">$TempName") || die "Unable to create temp file $TempName";
-
-# Post header to the temp file
-print (TEMPFILE $content);
-
 # Read the list of files added
 if (! -f "$NEWFILESFILE")
 {
@@ -105,67 +100,10 @@ while(<NEWFILES>)
 	($Field1, $LongName, $ShortName, $FileSize) = $csv->fields();
 	$FileSize = round($FileSize / 1024);
 	print "Proccessing file $LongName\n";
-	my $LongLength= length($LongName);
-	if ($LongLength > 25)
-	{
-		$Line2Out = substr($LongName . "                                                  ", 25, 25) . "|";
-		if ($LongLength > 50)
-		{
-			$Line3Out = substr($LongName . "                                                  ", 50, 25) . "|";
-			if ($LongLength > 75)
-			{
-				$Line4Out = substr($LongName . "                                                  ", 75, 25) . "|";
-				if ($LongLength > 100)
-				{
-					$Line5Out = substr($LongName . "                                                  ", 100, 25) . "|";
-					if ($LongLength > 125)
-					{
-						$Line6Out = substr($LongName . "                                                  ", 125, 25) . "|";
-						if ($LongLength > 150)
-						{
-							$Line7Out = substr($LongName . "                                                  ", 50, 25) . "|";
-						}
-					}
-				}
-			}
-		}
-	}
-	my $OutputStr = $LongName . " | ($FileSize KB)";
-	$DiscordText = "$DiscordText\n$LongName - (Size $FileSize KB)\n";
-	if ($FilesWorked > 0)
-	{
-		print (TEMPFILE "---\n");
-		$DiscordText = "$DiscordText\n";
-	}
+	$DiscordText = "$DiscordText\n$LongName - (Size $FileSize KB)";
 	$FilesWorked++;
-	print (TEMPFILE "$OutputStr\n");
-	if ($Line2Out ne "")
-	{
-		print (TEMPFILE "$Line2Out\n");
-	}
-	if ($Line3Out ne "")
-	{
-		print (TEMPFILE "$Line3Out\n");
-	}
-	if ($Line4Out ne "")
-	{
-		print (TEMPFILE "$Line4Out\n");
-	}
-	if ($Line5Out ne "")
-	{
-		print (TEMPFILE "$Line5Out\n");
-	}
-	if ($Line6Out ne "")
-	{
-		print (TEMPFILE "$Line6Out\n");
-	}
-	if ($Line7Out ne "")
-	{
-		print (TEMPFILE "$Line7Out\n");
-	}
 }
 close(NEWFILES);
-close(TEMPFILE);
 
 if ($DISCORD_WEBHOOK eq "")
 {
@@ -182,5 +120,7 @@ print "Webhook posting as '" . $webhook->{name} .
 $webhook->execute($DiscordText);
 sleep(5);
 #$webhook->execute('All files listed');
+unlink "$TempName" || die "Unable to delete temp file $TempName";
+unlink "$NEWFILESFILE" || die "Unable to delete list of files $NEWFILESFILE";
 
 exit 0;
