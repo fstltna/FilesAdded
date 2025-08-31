@@ -1,0 +1,140 @@
+#!/usr/bin/perl
+# perladd.pl - Download latest version at https://SynchronetBBS.org
+
+use 5.012;		# so readdir assigns to $_ in a lone while test
+use String::Scanf;	# imports sscanf()
+use Cwd qw(cwd);	# Load in cwd command
+use Storable;		# For loading & saving variables
+
+# Globals
+my $SEEN_FILE="/root/.filesseen";	# Stores the list of files we have seen already
+my $NEWFILES="/root/.newfilestoadd";		# Stores the list of files we have added but not posted about
+my $VERSION="1.0";
+
+# Init vars - don't change anything below here
+my $CUR_FILE="";
+my %SEEN_HASH=();
+my $DEFEDIT="/bin/vi";
+my $EDITOR="";
+my $WARN_ITEMS=15;
+
+print("perladd.pl - Version v$VERSION\n");
+print("=============================\n");
+
+sub QueueItems
+{
+	my $ItemCount = 0;
+	if (!-f $NEWFILES)
+	{
+		print "No items in the posting queue\n";
+		return 0;
+	}
+	open(INPF, "<$NEWFILES") || die "Unable to open input file $NEWFILES";
+
+	while(<INPF>)
+	{
+		$ItemCount += 1;
+	}
+	close(INPF);
+	if ($_[0] eq "queueitems")
+	{
+		print "Currently there are $ItemCount items in the posting queue\n";
+	}
+	elsif ($ItemCount > $WARN_ITEMS)
+	{
+		print "More than $WARN_ITEMS in posting queue. Please run file_announce.pl\n";
+	}
+}
+
+# Save seen file hash
+print("Checking for saved files hash\n");
+
+if (-f $SEEN_FILE)
+{
+	%SEEN_HASH = %{retrieve($SEEN_FILE)};
+	print("Read in $SEEN_FILE\n");
+}
+else
+{
+	print("$SEEN_FILE not found\n");
+	%SEEN_HASH = ();
+}
+
+if ($ENV{'EDITOR'})
+{
+	$EDITOR = $ENV{'EDITOR'};
+}
+else
+{
+	$EDITOR = $DEFEDIT;
+}
+
+open(OUTF, ">>$NEWFILES") || die "Unable to open output file $NEWFILES";
+
+# quit unless we have the correct number of command-line args
+my $num_args = $#ARGV + 1;
+if ($num_args == 1) {
+	if ($ARGV[0] eq "inqueue")
+	{
+		QueueItems("queueitems");
+		exit 0;
+	}
+	else
+	{
+		print "Incorrect number of arguments\n";
+		print "Usage: perladd.pl \[inqueue\] - lists number of items in the queue to post\n";
+		close(OUTF);
+		exit;
+	}
+}
+elsif ($num_args > 1)
+{
+    print "Incorrect number of arguments\n";
+    print "Usage: perladd.pl \[inqueue\] - lists number of items in the queue to post\n";
+    close(OUTF);
+    exit;
+}
+
+# Loop for each entry in the current directory
+my $SOURCE_DIR = cwd;
+
+opendir(my $dh, $SOURCE_DIR) || die "Can't open '$SOURCE_DIR' directory: $!";
+while (readdir $dh)
+{
+	# Work on each file in the directory without index.* files
+	if ($_ ne "." && $_ ne ".." && $_ ne "index.html" && $_ ne "index.php" && $_ ne "perladd.pl" && $_ ne "perladd.txt")
+	{
+		$CUR_FILE = $_;
+		# Skip over directories
+		if (! -d $CUR_FILE)
+		{
+			if ($SEEN_HASH{"^$_\$"} eq "seen")
+			{
+				print("Already added $_ - skipping\n");
+			}
+			else
+			{
+				my $dest_file = $CUR_FILE;
+
+				my $filesize = -s $dest_file;
+
+				print "Adding '$CUR_FILE' to the queue:\n";
+				print(OUTF "\"$SOURCE_DIR\",\"$CUR_FILE\",\"$dest_file\",\"$filesize\"\n");
+				#print("File $_ not seen, adding to hash\n");
+				$SEEN_HASH{"^$_\$"} = "seen";
+				store (\%SEEN_HASH, $SEEN_FILE);
+				print("Saved seen file hash to $SEEN_FILE\n");
+			} 
+		}
+	}
+}
+closedir $dh;
+
+# Save seen file hash
+store (\%SEEN_HASH, $SEEN_FILE);
+print("Saved seen file hash to $SEEN_FILE\n");
+
+close(OUTF);
+QueueItems();
+
+exit 0;
