@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# file_remove.pl - Download latest version at https://SynchronetBBS.org
+# file_remove - Download latest version at https://SynchronetBBS.org
 
 use 5.012;		# so readdir assigns to $_ in a lone while test
 use String::Scanf;	# imports sscanf()
@@ -13,7 +13,7 @@ my $VERSION="1.0";
 # Init vars - don't change anything below here
 my %SEEN_HASH=();
 
-print("file_remove.pl - Version $VERSION\n");
+print("file_remove - Version $VERSION\n");
 print("=================================\n");
 print("Checking for saved files hash\n");
 
@@ -33,7 +33,7 @@ my $num_args = $#ARGV + 1;
 if ($num_args != 1)
 {
     print "Incorrect number of arguments\n";
-    print "Usage: file_remove.pl <file name>\n";
+    print "Usage: file_remove <file name>\n";
     exit(1);
 }
 

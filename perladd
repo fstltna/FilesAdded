@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# perladd.pl - Download latest version at https://SynchronetBBS.org
+# perladd - Download latest version at https://SynchronetBBS.org
 
 use 5.012;		# so readdir assigns to $_ in a lone while test
 use String::Scanf;	# imports sscanf()
@@ -18,7 +18,7 @@ my $DEFEDIT="/bin/vi";
 my $EDITOR="";
 my $WARN_ITEMS=15;
 
-print("perladd.pl - Version v$VERSION\n");
+print("perladd - Version v$VERSION\n");
 print("=============================\n");
 
 sub QueueItems
@@ -42,7 +42,7 @@ sub QueueItems
 	}
 	elsif ($ItemCount > $WARN_ITEMS)
 	{
-		print "More than $WARN_ITEMS in posting queue. Please run file_announce.pl\n";
+		print "More than $WARN_ITEMS in posting queue. Please run file_announce\n";
 	}
 }
 
@@ -82,7 +82,7 @@ if ($num_args == 1) {
 	else
 	{
 		print "Incorrect number of arguments\n";
-		print "Usage: perladd.pl \[inqueue\] - lists number of items in the queue to post\n";
+		print "Usage: perladd \[inqueue\] - lists number of items in the queue to post\n";
 		close(OUTF);
 		exit;
 	}
@@ -90,7 +90,7 @@ if ($num_args == 1) {
 elsif ($num_args > 1)
 {
     print "Incorrect number of arguments\n";
-    print "Usage: perladd.pl \[inqueue\] - lists number of items in the queue to post\n";
+    print "Usage: perladd \[inqueue\] - lists number of items in the queue to post\n";
     close(OUTF);
     exit;
 }
@@ -102,7 +102,7 @@ opendir(my $dh, $SOURCE_DIR) || die "Can't open '$SOURCE_DIR' directory: $!";
 while (readdir $dh)
 {
 	# Work on each file in the directory without index.* files
-	if ($_ ne "." && $_ ne ".." && $_ ne "index.html" && $_ ne "index.php" && $_ ne "perladd.pl" && $_ ne "perladd.txt")
+	if ($_ ne "." && $_ ne ".." && $_ ne "index.html" && $_ ne "index.php" && $_ ne "perladd" && $_ ne "perladd.txt")
 	{
 		$CUR_FILE = $_;
 		# Skip over directories
