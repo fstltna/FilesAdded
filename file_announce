@@ -7,13 +7,13 @@ use Math::Round;
 use Getopt::Long;
 use WebService::Discord::Webhook;
 
-my $DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1414865014615052299/_rQriXnygPeZ9TTILIdwLXsEQnMvLmxIZ1IdgBpZN2qzoHcXtS-5wD15A11ZMHcgA6hH";
+my $DISCORD_WEBHOOK = "EDITME";
 
 # Probably no change for this
 
 # == No changes below here
 my $content = "";
-my $VERSION = "1.0.0";
+my $VERSION = "1.1.0";
 my $NEWFILESFILE="/root/.newfilestoadd";	# Stores the list of files we have added but not posted about
 my $USAGE;
 my $CONF_FILE = "/root/.fa_settings";	# Settings to use
@@ -27,6 +27,7 @@ if (! -f $CONF_FILE)
 	open(OUTF, ">$CONF_FILE") || die "Unable to create $CONF_FILE for output";
 	print (OUTF "webhook=EDITME");
 	close(OUTF);
+	exit 0;
 }
 if (-e $CONF_FILE)
 {
@@ -44,6 +45,13 @@ if (-e $CONF_FILE)
 		}
 	}
 	close(INPF);
+}
+if ($DISCORD_WEBHOOK eq "EDITME")
+{
+	print "You need to set the webhook in the config file: $CONF_FILE\n";
+	sleep (3);
+	system("/usr/bin/vim $CONF_FILE");
+	exit 0;
 }
 
 print "Running file_announce $VERSION\n";
